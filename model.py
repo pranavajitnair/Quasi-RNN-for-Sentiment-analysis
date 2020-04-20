@@ -1,4 +1,3 @@
-import torch
 import torch.nn as nn
 from qrnn import QRNN
 
@@ -14,13 +13,11 @@ class Classifier(nn.Module):
             
             self.classifier=nn.Linear(hidden_size,10)
             
-            self.padding=nn.Parameter(torch.randn(1,embedding_size))
+        def forward(self,input):
             
-        def forward(self,input,mask):
+            output1,h,c=self.qrnn1(input)
+            output2,h,c=self.qrnn2(output1,c,h)
+            output3,h,c=self.qrnn3(output2,c,h)
+            output4,h,c=self.qrnn4(output3,c,h)
             
-            output1,h,c=self.qrnn1(input,mask)
-            output2,h,c=self.qrnn2(output1,mask,c,h)
-            output3,h,c=self.qrnn3(output2,mask,c,h)
-            output4,h,c=self.qrnn4(output3,mask,c,h)
-            
-            return self.classifier(h).squeeze(1)
+            return self.classifier(h)
