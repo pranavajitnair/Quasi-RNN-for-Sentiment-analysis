@@ -63,79 +63,36 @@ def preprocess(data):
                 ma=max(ma,len(x_prime))
                 
         return x1,ma
-    
-def get_batches(datax,datay,batch_size):
-        batchesx=[]
-        batchesy=[]
-        masks=[]
-        
-        for i in range(len(datax)//batch_size):
-                batchx=[]
-                batchy=[]
-                batchfinalx=[]
-                ma=0
-                mask=[]
-                
-                for j in range(i*batch_size,i*batch_size+batch_size):
-                        batchx.append(datax[j])
-                        batchy.append(datay[j])
-                        ma=max(ma,len(datax[j]))
-                        
-                for sentence in batchx:
-                        mask.append(len(sentence))
-                        for _ in range(ma-len(sentence)):
-                                sentence.append(0)
-                        batchfinalx.append(sentence)                 
-                        
-                batchesx.append(batchfinalx)
-                batchesy.append(batchy)
-                masks.append(mask)
-                
-        return batchesx,batchesy,masks        
-
 
 class DataLoader(object):
-        def __init__(self,datax,datay,masks,word_dict,embed_dim,padding):
+        def __init__(self,datax,datay,word_dict):
             
                 self.datax=datax
                 self.datay=datay
-                self.masks=masks
                 
-                self.embed_dim=embed_dim
                 self.word_dict=word_dict
                 
                 self.counter=0
                 self.len=len(datax)//2
                 
-                self.padding=padding
+                self.counter2=0
                 
         def load_next_batch(self,train):
                 if train:
                         x=self.datax[self.counter]
                         y=self.datay[self.counter]
-                        mask=self.masks[self.counter]
                         self.counter=(self.counter+1)%self.len
                         
                 else:
-                        x=self.datax[self.len]
-                        y=self.datay[self.len]
-                        mask=self.masks[self.len]
-                
-                l=[]
-                for sentence in x:
-                        sent=[]
+                        x=self.datax[self.len+self.counter2]
+                        y=self.datay[self.len+self.counter2]
+                        self.counter2=(1+self.counter2)%20
                         
-                        for word in sentence:
-                            
-                                if word!=0:
-                                        sent.append(torch.tensor(self.word_dict[word]).view(1,-1))
-                                else:
-                                        sent.append(self.padding.view(1,-1))
-                                        
-                        sent=torch.cat(sent,dim=0)                
-                        l.append(sent.view(1,-1,self.embed_dim))
+                l=[]
+                for word in x:
+                        l.append(self.word_dict[word])
                 
-                l=torch.cat(l,dim=0)
-                y=torch.tensor(y)
+                l=torch.tensor(l)
+                y=torch.tensor(y).view(1)
                 
-                return l,y,mask
+                return l,y
