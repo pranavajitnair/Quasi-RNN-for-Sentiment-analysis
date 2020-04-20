@@ -43,7 +43,7 @@ class QRNN(nn.Module):
                 
                 batch_size=input.shape[0]
                 
-                output=torch.zeros(batch_size,input.shape[1],self.hidden_size)
+#                output=torch.zeros(batch_size,input.shape[1],self.hidden_size)
                 cell_state=torch.zeros(batch_size,1,self.hidden_size)
                 hidden=torch.zeros(batch_size,1,self.hidden_size)
                 
@@ -64,8 +64,8 @@ class QRNN(nn.Module):
                 cell_temp=torch.cat(cell_states,dim=1)
                 
                 for i in range(batch_size):
-                        output[i,:mask[i],:]=hidden_temp[i,:mask[i],:]
+#                        output[i,:mask[i],:]=hidden_temp[i,:mask[i],:]
                         cell_state[i,0,:]=cell_temp[i,mask[i]-1,:]
                         hidden[i,0,:]=hidden_temp[i,mask[i]-1,:]
                         
-                return output,hidden,cell_state
+                return hidden_temp,hidden,cell_state

@@ -95,7 +95,7 @@ def get_batches(datax,datay,batch_size):
 
 
 class DataLoader(object):
-        def __init__(self,datax,datay,masks,word_dict,embed_dim):
+        def __init__(self,datax,datay,masks,word_dict,embed_dim,padding):
             
                 self.datax=datax
                 self.datay=datay
@@ -106,7 +106,8 @@ class DataLoader(object):
                 
                 self.counter=0
                 self.len=len(datax)//2
-
+                
+                self.padding=padding
                 
         def load_next_batch(self,train):
                 if train:
@@ -116,9 +117,9 @@ class DataLoader(object):
                         self.counter=(self.counter+1)%self.len
                         
                 else:
-                        x=self.datax[self.counter+self.len]
-                        y=self.datay[self.counter+self.len]
-                        mask=self.masks[self.counter+self.len]
+                        x=self.datax[self.len]
+                        y=self.datay[self.len]
+                        mask=self.masks[self.len]
                 
                 l=[]
                 for sentence in x:
@@ -127,13 +128,14 @@ class DataLoader(object):
                         for word in sentence:
                             
                                 if word!=0:
-                                        sent.append(self.word_dict[word])
+                                        sent.append(torch.tensor(self.word_dict[word]).view(1,-1))
                                 else:
-                                        sent.append([0 for _ in range(self.embed_dim)])
+                                        sent.append(self.padding.view(1,-1))
                                         
-                        l.append(sent)
+                        sent=torch.cat(sent,dim=0)                
+                        l.append(sent.view(1,-1,self.embed_dim))
                 
-                l=torch.tensor(l)
+                l=torch.cat(l,dim=0)
                 y=torch.tensor(y)
                 
                 return l,y,mask
