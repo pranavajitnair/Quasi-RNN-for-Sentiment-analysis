@@ -2,7 +2,7 @@
 
 Instead of Using a standard RNN or and of it's variants(GRU,LSTM) a 4 layer deep QRNN has been used.
 
-# IMDB datset
+## IMDB datset
 
 @InProceedings{maas-EtAl:2011:ACL-HLT2011,
   author    = {Maas, Andrew L.  and  Daly, Raymond E.  and  Pham, Peter T.  and  Huang, Dan  and  Ng, Andrew Y.  and  Potts, Christopher},
